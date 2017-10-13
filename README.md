@@ -67,6 +67,8 @@ There are a few caveats to using this shell for now:
     regular shell. For most commands, it's harmless. One side effect is that if
     a command changes the current directory, it could be that the prompt shows
     the wrong path.
+4.  Starting the shell on a remote node (for example, using `remsh`) is not 
+    currently supported.
 
 ## Installation
 
