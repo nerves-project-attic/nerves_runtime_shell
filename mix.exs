@@ -7,7 +7,9 @@ defmodule NervesRuntimeShell.Mixfile do
       version: "0.1.0",
       elixir: "~> 1.4",
       start_permanent: Mix.env == :prod,
-      deps: deps()
+      deps: deps(),
+      description: description(),
+      package: package()
     ]
   end
 
@@ -20,5 +22,17 @@ defmodule NervesRuntimeShell.Mixfile do
   defp deps do
     [
     ]
+  end
+
+  defp description do
+    """
+    A custom shell for debugging and running commands on Nerves devices in a bash-like environment.
+    """
+  end
+
+  defp package do
+    [maintainers: ["Jeff Smith", "Frank Hunleth"],
+     licenses: ["Apache 2.0"],
+     links: %{"Github" => "https://github.com/nerves-project/nerves_runtime_shell"}]
   end
 end
