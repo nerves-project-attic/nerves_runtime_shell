@@ -38,10 +38,10 @@ defmodule Nerves.Runtime.Shell do
       # The shell should not start until the system is up and running.
       case :init.notify_when_started(self()) do
         :started -> :ok
-        _        -> :init.wait_until_started()
+        _ -> :init.wait_until_started()
       end
 
-      :io.setopts(Process.group_leader, binary: true, encoding: :unicode)
+      :io.setopts(Process.group_leader(), binary: true, encoding: :unicode)
 
       Server.start(opts, mfa)
     end)

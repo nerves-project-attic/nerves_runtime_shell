@@ -13,18 +13,20 @@ defmodule Nerves.Runtime.Shell.Server do
     receive do
       {:DOWN, ^ref, :process, ^pid, :normal} ->
         run(opts)
+
       {:DOWN, ^ref, :process, ^pid, other} ->
-        IO.puts("#{__MODULE__} failed to start due to reason: #{inspect other}")
+        IO.puts("#{__MODULE__} failed to start due to reason: #{inspect(other)}")
     end
   end
 
   defp run(opts) when is_list(opts) do
-    IO.puts """
+    IO.puts("""
     Nerves Interactive Command Shell
 
     Type Ctrl+G to exit the shell and return to Erlang job control.
     This is not a normal shell, so try not to type Ctrl+C.
-    """
+    """)
+
     evaluator = start_evaluator(opts)
     state = %{counter: 1, cwd: File.cwd!(), prefix: "sh"}
     loop(state, evaluator, Process.monitor(evaluator))
@@ -42,9 +44,11 @@ defmodule Nerves.Runtime.Shell.Server do
   defp exit_loop(evaluator, evaluator_ref, done? \\ true) do
     Process.delete(:evaluator)
     Process.demonitor(evaluator_ref, [:flush])
+
     if done? do
       send(evaluator, {:done, self()})
     end
+
     :ok
   end
 
@@ -58,11 +62,14 @@ defmodule Nerves.Runtime.Shell.Server do
       {:input, ^input, command} when is_binary(command) ->
         send(evaluator, {:eval, self(), command, state})
         wait_eval(state, evaluator, evaluator_ref)
+
       {:input, ^input, {:error, :interrupted}} ->
         IO.puts("Interrupted")
         loop(state, evaluator, evaluator_ref)
+
       {:input, ^input, :eof} ->
         exit_loop(evaluator, evaluator_ref)
+
       {:input, ^input, {:error, :terminated}} ->
         exit_loop(evaluator, evaluator_ref)
     end
@@ -72,6 +79,7 @@ defmodule Nerves.Runtime.Shell.Server do
     receive do
       {:evaled, ^evaluator, new_state} ->
         loop(new_state, evaluator, evaluator_ref)
+
       {:EXIT, _pid, :interrupt} ->
         # User did ^G while the evaluator was busy or stuck
         IO.puts("** (EXIT) interrupted")
@@ -85,9 +93,12 @@ defmodule Nerves.Runtime.Shell.Server do
 
   def start_evaluator(opts) do
     self_pid = self()
-    self_leader = Process.group_leader
-    evaluator = opts[:evaluator] || :proc_lib.start(Nerves.Runtime.Shell.Evaluator, :init, [:ack, self_pid, self_leader, opts])
+    self_leader = Process.group_leader()
+
+    evaluator =
+      opts[:evaluator] ||
+        :proc_lib.start(Nerves.Runtime.Shell.Evaluator, :init, [:ack, self_pid, self_leader, opts])
+
     evaluator
   end
 end
-

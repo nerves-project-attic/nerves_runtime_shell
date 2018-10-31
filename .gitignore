@@ -18,3 +18,7 @@ erl_crash.dump
 
 # Also ignore archive artifacts (built via "mix archive.build").
 *.ez
+
+# Ignore package tarball (built via "mix hex.build").
+nerves_runtime_shell-*.tar
+
